@@ -11,18 +11,6 @@ from datetime import datetime
 # Protocol: to connect, send string "SuperSecretHandshake"
 # Confirmation of handshake is "Success\tYour name:"
 
-# Create a welcome socket bound at serverPort
-serverPort = 12009
-serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-serverSocket.bind(('', serverPort))
-serverSocket.listen(10)
-
-print('The Hello Name server is ready to receive')
-accessTime = datetime.now()
-print("Access time is: ", accessTime)
-read_file = open("tst.txt")
-
 
 def validateuser(file, username, info):
     # Split user's info up into parts
