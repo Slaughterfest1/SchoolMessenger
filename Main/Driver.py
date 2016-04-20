@@ -52,7 +52,19 @@ class DriverThread(threading.Thread):
         file.write(username + ":" + password + ":" + firstname + ":" + lastname + ":" + email)
         return True
 
+    def add_friend(user_adding, user_added)
+        filename = user_adding + "friends.txt"
+        file = open(filename, 'w')
 
+        file.write(user_added) + ":"
+        return True
+
+    def get_friends(username):
+        friends_file = open(username + "friends.txt", "r")
+        friends = friends_file.read().split(':')
+
+        return friends
+        
 def user_is_registered(username):
     # Get current folder
     curr_dir = os.getcwd()
