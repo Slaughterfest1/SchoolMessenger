@@ -23,6 +23,10 @@ class DriverThread(threading.Thread):
             list_string = self.socket.recv(1024)
             test_list = pickle.loads(list_string)
 
+            # this test works and created the file, but I can't call the save_registration or
+            # user_is_registered method from here, so I had to put the registration code
+            # directly into the run method.          
+
             if "registration" in test_list[0]:
                 username = test_list[1]
 
