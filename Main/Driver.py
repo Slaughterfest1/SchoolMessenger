@@ -2,6 +2,7 @@ import socket
 import threading
 import os.path
 import time
+import pickle
 
 
 class DriverThread(threading.Thread):
@@ -17,6 +18,27 @@ class DriverThread(threading.Thread):
         while(1):
             response = self.socket.recv(1024).decode()
             print(response)
+
+            # unpickle list and print it
+            list_string = self.socket.recv(1024)
+            test_list = pickle.loads(list_string)
+
+            if "registration" in test_list[0]:
+                username = test_list[1]
+
+                password = test_list[2]
+                firstname = test_list[3]
+                lastname = test_list[4]
+                email = test_list[5]
+
+                # Create new file for user
+                filename = username + ".txt"
+                file = open(filename, 'w')
+
+                # Save registration information
+                file.write(username + ":" + password + ":" + firstname + ":" + lastname + ":" + email)
+                return True
+            
         print("Thread ended")
 
     def save_message(from_user, to_user, message):
@@ -34,15 +56,15 @@ class DriverThread(threading.Thread):
 
 
     def save_registration(info_list):
-        username = info_list[0]
+        username = info_list[1]
 
         if user_is_registered(username):
             return False
 
-        password = info_list[1]
-        firstname = info_list[2]
-        lastname = info_list[3]
-        email = info_list[4]
+        password = info_list[2]
+        firstname = info_list[3]
+        lastname = info_list[4]
+        email = info_list[5]
 
         # Create new file for user
         filename = username + ".txt"
@@ -52,7 +74,7 @@ class DriverThread(threading.Thread):
         file.write(username + ":" + password + ":" + firstname + ":" + lastname + ":" + email)
         return True
 
-    def add_friend(user_adding, user_added)
+    def add_friend(user_adding, user_added):
         filename = user_adding + "friends.txt"
         file = open(filename, 'w')
 
@@ -64,7 +86,7 @@ class DriverThread(threading.Thread):
         friends = friends_file.read().split(':')
 
         return friends
-        
+              
 def user_is_registered(username):
     # Get current folder
     curr_dir = os.getcwd()
@@ -95,7 +117,5 @@ while 1:
 
     # Save started thread into array of threads
     threads.append(thread)
-
-
 
 # Pass the connection socket to the new thread
