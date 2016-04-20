@@ -1,79 +1,89 @@
 import socket
 import threading
 import os.path
+import time
 
-class Driver(threading.Thread):
 
-    def __init__(self, ip, port, socket):
+class DriverThread(threading.Thread):
+
+    def __init__(self, new_socket):
         threading.Thread.__init__(self)
-        self.ip = ip
-        self.port = port
-        self.socket = socket
-        print("(NEW THREAD) for IP: " + ip + ", Port = " + port)
+        self.socket = new_socket
+        print("(NEW THREAD)")
+        # self.username_list = [f for f in listdir(os.getcwd()) if isfile(join("stuff", f))]
+
+    def run(self):
+
+        while(1):
+            response = self.socket.recv(1024).decode()
+            print(response)
+        print("Thread ended")
+
+    def save_message(from_user, to_user, message):
+        filename = to_user + ".txt"
+        open(filename).write(to_user + ":" + from_user + ":" + message)
 
 
-def run(self, socket):
-    self.socket.send("You are connected!".encode())
+    def find_message(username):
+        filename = username + ".txt"
+        for fileline in open(filename + ".txt", "r"):
+            line_split = fileline.split(":")
+            # Check for a username match
+            if username == line_split[0]:
+                return username, line_split[1], line_split[2]
 
 
-def main(self):
-    serverport = 12009
-    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 10)
-    serverSocket.bind(('', serverport))
+    def save_registration(info_list):
+        username = info_list[0]
 
-    threads = []
-    # Wait for incoming connections
-    while 1:
-        serverSocket.listen(10)
-        print("(DRIVER) Waiting for connection...")
-        (newsocket, (ip, port)) = serverSocket.accept()
+        if user_is_registered(username):
+            return False
 
-        # Create new thread for new connection
-        thread = Driver(ip, port, newsocket)
-        thread.start()
+        password = info_list[1]
+        firstname = info_list[2]
+        lastname = info_list[3]
+        email = info_list[4]
 
-        # Save started thread into array of threads
-        threads.append(thread)
+        # Create new file for user
+        filename = username + ".txt"
+        file = open(filename, 'w')
+
+        # Save registration information
+        file.write(username + ":" + password + ":" + firstname + ":" + lastname + ":" + email)
+        return True
 
 
-def savemessage(fromUserName, toUserName, message):
-    filename = toUserName + ".txt"
-    open(filename).write(toUserName + ":" + fromUserName + ":" + message)
+def user_is_registered(username):
+    # Get current folder
+    curr_dir = os.getcwd()
+    print("Current directory = " + curr_dir)
 
-def findmessage(username):
     filename = username + ".txt"
-    for fileline in open(filename + ".txt", "r"):
-        linesplit = fileline.split(":")
-        # Check for a username match
-        if username == linesplit[0]:
-            return username, linesplit[1], linesplit[2]
-
-
-def saveregistration(list):
-    username = list[0]
-
-    if userisregistered(username):
-        return False
-
-    password = list[1]
-    firstname = list[2]
-    lastname = list[3]
-    email = list[4]
-
-    # Create new file for user
-    filename = username + ".txt"
-    file = open(filename, 'w')
-
-    #Save registration information
-    file.write( username + ":" + password + ":" + firstname + ":" + lastname + ":" + email)
-    return True
-
-def userisregistered(username):
-    filename = username + ".txt"
+    print(os.path.isfile(filename))
     return os.path.isfile(filename)
 
 
+serverport = 12009
+serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 10)
+serverSocket.bind(('', serverport))
 
-#Pass the connection socket to the new thread
+threads = []
+# Wait for incoming connections
+while 1:
+    serverSocket.listen(10)
+    print("(DRIVER) Waiting for connection...")
 
+    newsocket, address = serverSocket.accept()
+    print("(DRIVER) Connection started...")
+
+    # Create new thread for new connection
+    thread = DriverThread(newsocket)
+    thread.start()
+
+    # Save started thread into array of threads
+    threads.append(thread)
+
+
+
+# Pass the connection socket to the new thread
